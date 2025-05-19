@@ -1,4 +1,4 @@
-# SBM (Starexx Benchmark)
+# BlackHole Benchmark
 
 A performance benchmarking tool that stress-tests devices by rendering multiple animated 3D spheres with volumetric lighting effects using WebGL.
 
@@ -6,7 +6,7 @@ A performance benchmarking tool that stress-tests devices by rendering multiple 
 
 The benchmark displays results in this compact format:
 ```js
-{FPS}{Instances}{FrameRate}Elapsed{Resolution}
+{FPS}{Instances}{FrameRate}{Elapsed}{Resolution}
 ```
 
 Example Output: `60816.673.2119201080`
@@ -22,6 +22,7 @@ Example Output: `60816.673.2119201080`
    - Number of active 3D objects being rendered
    - Doubles every second (1, 2, 4, 8, 16...)
    - Tests how many objects your device can handle
+   - Currently it's set to "300" and max to 300000...
 
 3. **FrameTime (ms)**  
    - Average time to render one frame in milliseconds
