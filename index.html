@@ -92,8 +92,7 @@
 
       gl_FragColor = vec4(color, 1.0);  
     }  
-  </script>  
-  
+  </script>    
   <script>
     const canvas = document.getElementById("glcanvas");  
     const gl = canvas.getContext("webgl");  
@@ -226,10 +225,11 @@
     const frameTimeHistoryLength = 60;
     
     
-    // Default - 1
-    const MIN_INSTANCES = 300;    // Set minimum instances to ^300
-    // Default - 48,000
-    const MAX_INSTANCES = 3000000; // Set maximum instances to 30,000 (L)
+    // DEFAULT_MIN_INSTANCES = 1
+    const MIN_INSTANCES = 1073741824;  // Set minimum instances to 1073741824 (Dangerous for Low-End Devices)
+    
+    // DEFAULT_MAX_INSTANCES = 1073741824
+    const MAX_INSTANCES = 633825300114114700748351602688;
     
     function updateInstances(currentTimeSec) {  
       const baseCount = Math.pow(2, Math.floor(currentTimeSec));
