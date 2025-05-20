@@ -3,7 +3,7 @@
 A performance benchmarking tool that stress-tests devices by rendering multiple animated 3D spheres with volumetric lighting effects using WebGL.
 
 **Note:**
-This benchmark is **extremely intensive** and designed to push your device to its **absolute limits**. The default instance of `1` has been forcefully expanded to `1073741824` `(2³⁰)`, resulting in extremely high computational load.
+This benchmark is **extremely intensive** and designed to push your device to its **absolute limits**. The default instance of `1` has been forcefully expanded to `41824`, resulting in extremely high computational load.
 As a result, your device may experience excessive **heating, crashes, freezes**, or **lag**, especially on low-end or older hardware.
 
 This benchmark is intended **only for flagship smartphones or high-performance PCs.**
@@ -34,7 +34,7 @@ Example Output: `60816.673.2119201080`
    - Custom Instances Support
    ```js
     // DEFAULT_MIN_INSTANCES = 1
-    const MIN_INSTANCES = 1073741824;  // Set minimum instances to 1073741824 (Dangerous for Low-End Devices)
+    const MIN_INSTANCES = 41824;  // Set minimum instances to 1073741824 (Dangerous for Low-End Devices)
     
     // DEFAULT_MAX_INSTANCES = 1073741824
     const MAX_INSTANCES = 633825300114114700748351602688;
