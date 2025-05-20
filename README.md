@@ -1,4 +1,4 @@
-# BlackHole Benchmark
+# Black Hole
 
 A performance benchmarking tool that stress-tests devices by rendering multiple animated 3D spheres with volumetric lighting effects using WebGL.
 
@@ -22,18 +22,24 @@ Example Output: `60816.673.2119201080`
    - Number of active 3D objects being rendered
    - Doubles every second (1, 2, 4, 8, 16...)
    - Tests how many objects your device can handle
-   - Currently it's set to "300" and max to 300000...
+   - Custom Instances Support
+   ```js
+     // Default - 1
+    const MIN_INSTANCES = 300;    // Set minimum instances to ^300
+    // Default - 2468101214161820
+    const MAX_INSTANCES = 30000000000; // Set maximum instances to 30000000000
+     ```
 
-3. **FrameTime (ms)**  
+4. **FrameTime (ms)**  
    - Average time to render one frame in milliseconds
    - Lower values are better (16.67ms = 60 FPS)
    - Values above 33ms indicate performance issues
 
-4. **Elapsed (seconds)**
+5. **Elapsed (seconds)**
    - Time since benchmark started
    - Shows how long your device maintains performance
 
-5. **Resolution**  
+6. **Resolution**  
    - Current rendering resolution in pixels
    - Higher resolutions require more GPU power
 
@@ -79,4 +85,4 @@ When comparing different devices, focus on:
 
 ## License
 
-**MIT License** - Copyright (c) 2025 Starexx (**Ankit Mehta**)
+MIT License - Copyright (c) 2025 Starexx (Ankit Mehta)
