@@ -1,98 +1,64 @@
+
 # Black Hole
 
-A performance benchmarking tool that stress-tests devices by rendering multiple animated 3D spheres with volumetric lighting effects using WebGL.
+**WARNING**: This is an extremely dangerous stress test that pushes your device to its absolute limits. It renders thousands of animated, ray-marched spheres with real-time volumetric lighting via WebGL fragment shaders.
 
-**Note:**
-This benchmark is **extremely intensive** and designed to push your device to its **absolute limits**. The default instance of `1` has been forcefully expanded to `41824`, resulting in extremely high computational load.
-As a result, your device may experience excessive **heating, crashes, freezes**, or **lag**, especially on low-end or older hardware.
+- Running this test may cause:
+- Overheating
+- System lag or unresponsiveness
+- Crashes or automatic reboots
+- Battery drainage or thermal throttling
 
-This benchmark is intended **only for flagship smartphones or high-performance PCs.**
-Running it on unsuitable hardware may cause **unexpected behavior or system instability**.
-**Please do not blame the creator** for any issues or side effects caused during or after the test.
+This is not a demo. This is not a visualizer. This is a torture test.
+Use only on high-end PCs or flagship devices. Not safe for average or low-end hardware.
+
+**The creator takes no responsibility for any damage, data loss, or performance degradation caused by running this test.**
+
+## How It Works
+
+This site uses ray-marched spheres with glowing volumetric effects and 64-step per-pixel calculations, rendering via shader-based lighting (no rasterization) in a real-time WebGL loop with exponentially increasing object count and live performance metrics.
 
 
-## Understanding Benchmark Scores
 
-The benchmark displays results in this compact format:
+### Output Format
+
+Displays as a compact string:
+
 ```js
-{FPS}{Instances}{FrameRate}{Elapsed}{Resolution}
+{FPS}{Instances}{FrameTime}{Elapsed}{Resolution}
 ```
 
-Example Output: `60816.673.2119201080`
+**Example**: `60816.673.2119201080`
 
-### Score Components Explained:
+**Components:**
 
-1. **FPS (Frames Per Second)**
-   - Measures rendering smoothness
-   - Higher values indicate better performance
-   - 60 FPS is the target for smooth animation
+- **FPS**: Frames Per Second. Higher is better.
+- **Instances**: Number of 3D objects. Doubles each second.
+- **FrameTime**: Time to render a frame (ms). Lower is better.
+- **Elapsed**: Seconds since start.
+- **Resolution**: Pixel dimensions of canvas.
 
-2. **Instances**  
-   - Number of active 3D objects being rendered
-   - Doubles every second (1, 2, 4, 8, 16...)
-   - Tests how many objects your device can handle
-   - Custom Instances Support
-   ```js
-    // DEFAULT_MIN_INSTANCES = 1
-    const MIN_INSTANCES = 41824;  // Set minimum instances to 1073741824 (Dangerous for Low-End Devices)
-    
-    // DEFAULT_MAX_INSTANCES = 1073741824
-    const MAX_INSTANCES = 633825300114114700748351602688;
+### Initial Load Configuration
+```js
+const MIN_INSTANCES = 41824;  // Forced starting pressure
+const MAX_INSTANCES = 2 ** 99;  // Effectively infinite
+```
+**Objects multiply exponentially:**
+
+```js
+1 → 2 → 4 → 8 → 16 → 32 → 64 → ...
+```
+**Note**: Any interaction (mouse/touch) accelerates this growth rate.
 
 
-4. **FrameTime (ms)**  
-   - Average time to render one frame in milliseconds
-   - Lower values are better (16.67ms = 60 FPS)
-   - Values above 33ms indicate performance issues
+## Performance Evaluation
 
-5. **Elapsed (seconds)**
-   - Time since benchmark started
-   - Shows how long your device maintains performance
+This test hits multiple subsystems at once:
 
-6. **Resolution**  
-   - Current rendering resolution in pixels
-   - Higher resolutions require more GPU power
+**GPU**: Shader intensity, parallel computation load
+**CPU**: JavaScript draw loop + memory management
+**Memory**: Rapid buffer scaling, exponential allocations
+**Thermals**: Sustained draw calls under full GPU load
 
-## How the Benchmark Works
-
-This test evaluates several aspects of device performance:
-
-- **GPU Capabilities**: Through complex fragment shader calculations
-- **Thermal Performance**: By sustaining heavy load over time
-- **Memory Bandwidth**: With exponentially increasing object counts
-- **JavaScript Execution**: Via real-time WebGL rendering
-
-The benchmark uses:
-- Ray-marched spheres with volumetric glow effects
-- 64-step ray marching per pixel
-- Exponential instance growth to increase load
-- Precise frame timing measurements
-
-## Getting Accurate Results
-
-For reliable benchmark scores:
-1. Close other running applications
-2. Connect to power source during testing
-3. Disable power saving modes
-4. Use latest version of Chrome or Firefox
-5. Run test for at least 30 seconds
-6. Allow the browser to use hardware acceleration
-
-## Comparing Devices
-
-When comparing different devices, focus on:
-- Maximum stable FPS maintained
-- Highest instance count before FPS drops significantly
-- Consistency of frame times throughout the test
-
-## Technical Specifications
-
-- **Rendering Method**: Ray marching in fragment shader
-- **Shader Complexity**: 64 iterations per pixel
-- **Load Scaling**: Objects double every second
-- **Measurement**: Uses window.performance API
-- **Compatibility**: Works on all WebGL-capable devices
-
-## License
-
-MIT License - Copyright (c) 2025 Starexx (Ankit Mehta)
+# License
+MIT License © 2025 Ankit Mehta
