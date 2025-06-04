@@ -1,49 +1,51 @@
 <!doctype html>  
-<html lang="en">  
-<head>  
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="description" content="WebGL Benchmark Test" />
-  <meta name="keywords" content="blackhole test, BlackHole Benchmark, Black Hole Benchmark, volumeshader_bm, starexx_bm, WebGL, Benchmark, Performance, Graphics, Starexx, Starexx Benchmark, Starexx Black Hole" />
-  <meta name="author" content="Starexx" />
-  <meta name="theme-color" content="#000000" />
-  <meta property="og:title" content="BlackHole" />
-  <meta property="og:type" content="website" />
-  <meta property="og:description" content="Device stress performance test" /> 
-  <style>
+<html lang="en"><head>
+ <!--[ by @starexx *frag, css, js ]-->
+ <title>BlackHole</title>
+     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+     <meta name="description" content="Learn more about the site before opening. Legal Advice **Harmfull for your Device**" />
+     <meta name="keywords" content="blackhole test, BlackHole Benchmark, Black Hole Benchmark, volumeshader_bm, starexx_bm, WebGL, Benchmark, Performance, Graphics, Starexx, Starexx Benchmark, Starexx Black Hole" />
+ <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    :root { 
-      --vec3: black;--uv: white;--glow: monospace;--cos: transparent;--res-x: 10px;--res-y: 10px;
+    :root
+  { 
+      --vec3: black;--uv: white;--glow: monospace;--cos: transparent;--res-x: 10px;--res-y: 10px;--sin: 10px 14px;--xy: 8px;--y: blur(0px);--x: blur(25px); --float-z: 1;--sphere: 0;--float: hidden;
       /*!Important*/ 
-      --sin: 10px 14px;--xy: 8px;--y: blur(0px);--x: blur(25px); --float-z: 1;--sphere: 0;--float: hidden;--vec3-ws: pre-line;--pos-abs: absolute;--webkit-tap-highlight: transparent; --user-select: none;--none: none;--0: 0;--bl: block;--fx: fixed;--full: 100%;--transparent: transparent; --touch-action: manipulation
+      --vec3-ws: pre-line;--pos-abs: absolute;--webkit-tap-highlight: transparent; --user-select: none;--none: none;--0: 0;--bl: block;--fx: fixed;--full: 100%;--transparent: transparent; --touch-action: manipulation
       ; 
    }
-    
-    html, body {  
-      margin: var(--sphere);  overflow: var(--float);background: var(--vec3);  color: var(--uv);font-family: var(--glow);-webkit-tap-highlight-color: var(--transparent);
-      user-select: var(--user-select);width: var(--full);height: var(--full);position: var(--fx);top: var(--0);left: var(--0);right: var(--0);bottom: var(--0);touch-action: var(--touch-action)
+     
+    html, body /* Page Index */
+  {  
+      margin: var(--sphere);overflow: var(--float);background: var(--vec3);color: var(--uv);font-family: var(--glow);-webkit-tap-highlight-color: var(--transparent);width: var(--full);
+      user-select: var(--user-select);height: var(--full);position: var(--fx);top: var(--0);left: var(--0);right: var(--0);bottom: var(--0);touch-action: var(--touch-action)
      ;
    }
     
-    #info {     
-      position: var(--pos-abs);  top: var(--res-y);left: var(--res-x);  background: var(--cos);padding: var(--sin);  
-      border-radius: var(--xy);backdrop-filter: var(--y);-webkit-backdrop-filter: var(--x);z-index: var(--float-z);white-space: var(--vec3-ws);pointer-events: var(--none)
+    #info /* Compact Info */
+  {     
+      position: var(--pos-abs);  top: var(--res-y);left: var(--res-x);  background: var(--cos);padding: var(--sin);pointer-events: var(--none);
+      border-radius: var(--xy);backdrop-filter: var(--y);-webkit-backdrop-filter: var(--x);z-index: var(--float-z);white-space: var(--vec3-ws);
      ;
    }
     
-    canvas {
+    canvas /* WebGL Canvas */
+  {
       display: var(--bl);width: var(--full);height: var(--full);
       position: var(--fx);top: var(--0);left: var(--0)
      ;
    }
-  </style>  
-</head>  
+ </style>
+     <meta property="og:description" content="Device stress performance test" />
+     <meta property="og:title" content="BlackHole" /><meta name="author" content="Starexx" />
+     <meta property="og:type" content="website" /><meta name="theme-color" content="#000000" />
+  </head>  
 <body>  
   <canvas id="glcanvas"></canvas>    
-   
-   <div id="info"> <b> </b> </div>
-  
+  <!--[COMPACT INFO]--> 
+  <div id="info"> <b> </b> </div>
+    
   <script id="fragShader" type="x-shader/x-fragment">  
     precision highp float;  
     uniform vec2 u_resolution;  
@@ -87,18 +89,18 @@
 
       gl_FragColor = vec4(color, 1.0);  
     }  
-  </script>    
+  </script>  
   <script>
     const canvas = document.getElementById("glcanvas");  
     const gl = canvas.getContext("webgl");  
     const infoElement = document.getElementById("info");
     
-    // Audio context for beep sounds
+    
     let audioContext;
     let oscillator;
     let gainNode;
     
-    // Interaction variables
+    
     let interaction = 0;
     let mouseX = 0;
     let mouseY = 0;
@@ -142,16 +144,16 @@
     function playBeep(fps) {
       if (!audioContext) return;
       
-      // Stop any existing oscillator
+      
       if (oscillator) {
         oscillator.stop();
       }
       
-      // Create new oscillator
+      
       oscillator = audioContext.createOscillator();
       oscillator.type = 'sine';
       
-      // Higher FPS = higher pitch
+      
       const minFPS = 10;
       const maxFPS = 60;
       const clampedFPS = Math.max(minFPS, Math.min(fps, maxFPS));
@@ -159,14 +161,14 @@
       
       oscillator.frequency.value = freq;
       
-      // Lower FPS = louder beep (more noticeable when lagging)
+      
       const volume = 0.1 + (1 - (clampedFPS / maxFPS)) * 0.4;
       gainNode.gain.value = volume;
       
       oscillator.connect(gainNode);
       oscillator.start();
       
-      // Short beep duration
+      
       oscillator.stop(audioContext.currentTime + 0.05);
     }
     
@@ -344,7 +346,5 @@
       `;
     }   
     render();
-  </script>  
-  
-</body>  
+  </script></body>
 </html>
