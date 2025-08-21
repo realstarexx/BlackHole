@@ -1,239 +1,350 @@
-<!doctype html>
-<html lang="en">
-<head><meta charset="UTF-8">    
-    <style>body,html{height:100%;width:100%;margin:0;padding:0;overflow:hidden;touch-action:none}canvas{position:fixed;top:0;left:0;width:100%;height:100%}#a1b2c3d4{position:fixed;width:100%;height:100%;pointer-events:none;z-index:9999;backdrop-filter:blur(50px)}</style>
-</head>
-<body>
-    <canvas id="e5f6g7h8"></canvas>
-    <div id="a1b2c3d4"></div>
-    <script id="i9j0k1l2" type="x-shader/x-fragment">
-    precision highp float;
-    uniform vec2 u_res;
-    uniform float u_t;
-    uniform vec2 u_m;
-    uniform float u_i;
+<!doctype html>  
+<html lang="en"><head>
+ <!--[ by @starexx *frag, css, js ]-->
+ <title>BlackHole</title>
+     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+     <meta name="description" content="Learn more about the site before opening. Legal Advice **Harmfull for your Device**" />
+     <meta name="keywords" content="blackhole test, BlackHole Benchmark, Black Hole Benchmark, volumeshader_bm, starexx_bm, WebGL, Benchmark, Performance, Graphics, Starexx, Starexx Benchmark, Starexx Black Hole" />
+ <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    :root
+  { 
+      --vec3: black;--uv: white;--glow: monospace;--cos: transparent;--res-x: 10px;--res-y: 10px;--sin: 10px 14px;--xy: 8px;--y: blur(0px);--x: blur(25px); --float-z: 1;--sphere: 0;--float: hidden;
+      /*!Important*/ 
+      --vec3-ws: pre-line;--pos-abs: absolute;--webkit-tap-highlight: transparent; --user-select: none;--none: none;--0: 0;--bl: block;--fx: fixed;--full: 100%;--transparent: transparent; --touch-action: manipulation
+      ; 
+   }
+     
+    html, body /* Page Index */
+  {  
+      margin: var(--sphere);overflow: var(--float);background: var(--vec3);color: var(--uv);font-family: var(--glow);-webkit-tap-highlight-color: var(--transparent);width: var(--full);
+      user-select: var(--user-select);height: var(--full);position: var(--fx);top: var(--0);left: var(--0);right: var(--0);bottom: var(--0);touch-action: var(--touch-action)
+     ;
+   }
+    
+    #info /* Compact Info */
+  {     
+      position: var(--pos-abs);  top: var(--res-y);left: var(--res-x);  background: var(--cos);padding: var(--sin);pointer-events: var(--none);
+      border-radius: var(--xy);backdrop-filter: var(--y);-webkit-backdrop-filter: var(--x);z-index: var(--float-z);white-space: var(--vec3-ws);
+     ;
+   }
+    
+    canvas /* WebGL Canvas */
+  {
+      display: var(--bl);width: var(--full);height: var(--full);
+      position: var(--fx);top: var(--0);left: var(--0)
+     ;
+   }
+ </style>
+     <meta property="og:description" content="Device stress performance test" />
+     <meta property="og:title" content="BlackHole" /><meta name="author" content="Starexx" />
+     <meta property="og:type" content="website" /><meta name="theme-color" content="#000000" />
+  </head>  
+<body>  
+  <canvas id="glcanvas"></canvas>    
+  <!--[COMPACT INFO]--> 
+  <div id="info"> <b> </b> </div>
+    
+  <script id="fragShader" type="x-shader/x-fragment">  
+    precision highp float;  
+    uniform vec2 u_resolution;  
+    uniform float u_time;  
+    uniform vec2 u_mouse;
+    uniform float u_interaction;
 
-    float m3n4o5p6(vec3 p, float r) {
-        return length(p)-r;
+    float sphere(vec3 p, float r) {  
+      return length(p) - r;  
+    }  
+
+    float scene(vec3 p) {  
+      float time = u_time * (1.0 + u_interaction * 2.0);
+      float s = sphere(p - vec3(sin(time), cos(time), 0.0), 0.6);  
+      s += 0.3 * sin(p.x * 5.0 + time) * cos(p.y * 5.0 + time);  
+      return s;  
+    }  
+
+    vec3 getColor(float d, vec3 p) {  
+      float glow = 1.0 / (d * d + 0.1);  
+      return vec3(glow * 0.8, glow * 0.3, glow * 0.1);  
+    }  
+
+    void main() {  
+      vec2 uv = (gl_FragCoord.xy / u_resolution.xy) * 2.0 - 1.0;  
+      uv.x *= u_resolution.x / u_resolution.y;  
+
+      vec3 ro = vec3(0.0, 0.0, -3.0);  
+      vec3 rd = normalize(vec3(uv, 1.5));  
+
+      vec3 color = vec3(0.0);  
+      float t = 0.0;  
+
+      for (int i = 0; i < 64; i++) {  
+        vec3 p = ro + rd * t;  
+        float d = scene(p);  
+        if (d < 0.01) break;  
+        color += getColor(d, p) * 0.02;  
+        t += d * 0.5;  
+      }  
+
+      gl_FragColor = vec4(color, 1.0);  
+    }  
+  </script>  
+  <script>
+    const canvas = document.getElementById("glcanvas");  
+    const gl = canvas.getContext("webgl");  
+    const infoElement = document.getElementById("info");
+    
+    
+    let audioContext;
+    let oscillator;
+    let gainNode;
+    
+    
+    let interaction = 0;
+    let mouseX = 0;
+    let mouseY = 0;
+    let isInteracting = false;
+    
+    function setupCanvas() {
+      canvas.width = window.innerWidth;  
+      canvas.height = window.innerHeight;
+      
+      window.addEventListener('resize', function() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      });
+      
+      canvas.addEventListener('mousedown', startInteraction);
+      canvas.addEventListener('mousemove', handleMove);
+      canvas.addEventListener('mouseup', endInteraction);
+      canvas.addEventListener('mouseleave', endInteraction);
+      
+      canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        startInteraction(e.touches[0]);
+      });
+      canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        handleMove(e.touches[0]);
+      });
+      canvas.addEventListener('touchend', endInteraction);
+      
+      document.addEventListener('click', initAudioContext, { once: true });
+      document.addEventListener('touchstart', initAudioContext, { once: true });
     }
-
-    float q7r8s9t0(vec3 p) {
-        float t=u_t*(8.0+u_i*15.0);
-        float s=m3n4o5p6(p-vec3(sin(t*1.5),cos(t*2.1),sin(t*1.1)),0.35);
-        s+=0.6*sin(p.x*10.0+t*3.0)*cos(p.y*9.0+t*2.5);
-        s+=0.4*sin(p.z*8.0+t*2.2);
-        return s*0.6;
+    
+    function initAudioContext() {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      gainNode = audioContext.createGain();
+      gainNode.gain.value = 0;
+      gainNode.connect(audioContext.destination);
     }
-
-    vec3 u1v2w3x4(float d, vec3 p) {
-        float g=3.0/(d*d*d+0.03);
-        return vec3(g*1.5,g*0.7,g*0.4);
+    
+    function playBeep(fps) {
+      if (!audioContext) return;
+      
+      
+      if (oscillator) {
+        oscillator.stop();
+      }
+      
+      
+      oscillator = audioContext.createOscillator();
+      oscillator.type = 'sine';
+      
+      
+      const minFPS = 10;
+      const maxFPS = 60;
+      const clampedFPS = Math.max(minFPS, Math.min(fps, maxFPS));
+      const freq = 300 + (clampedFPS / maxFPS) * 1200;
+      
+      oscillator.frequency.value = freq;
+      
+      
+      const volume = 0.1 + (1 - (clampedFPS / maxFPS)) * 0.4;
+      gainNode.gain.value = volume;
+      
+      oscillator.connect(gainNode);
+      oscillator.start();
+      
+      
+      oscillator.stop(audioContext.currentTime + 0.05);
     }
-
-    void main() {
-        vec2 uv=(gl_FragCoord.xy/u_res)*2.0-1.0;
-        uv.x*=u_res.x/u_res.y;
-        vec3 ro=vec3(sin(u_t*0.4)*0.7,cos(u_t*0.3)*0.7,-3.5);
-        vec3 rd=normalize(vec3(uv,1.8));
-        vec3 c=vec3(0.0);
-        float t=0.0;
-        for(int i=0;i<150;i++) {
-            vec3 p=ro+rd*t;
-            float d=q7r8s9t0(p);
-            if(d<0.003) break;
-            c+=u1v2w3x4(d,p)*0.04;
-            t+=d*0.25;
-        }
-        gl_FragColor=vec4(c*1.5,1.0);
+    
+    function startInteraction(e) {
+      isInteracting = true;
+      mouseX = e.clientX;
+      mouseY = e.clientY;
     }
-    </script>
-
-    <script>
-    const c0d1e2f3=document.getElementById("e5f6g7h8");
-    const g4h5i6j7=c0d1e2f3.getContext("webgl");
-    const k8l9m0n1=document.getElementById("i9j0k1l2").textContent;
-
-    let o2p3q4r5;
-    let s6t7u8v9;
-    let w0x1y2z3;
-    let a4b5c6d7=0;
-    let e8f9g0h1=0;
-    let i2j3k4l5=0;
-    let m6n7o8p9=false;
-    const q0r1s2t3=60000;
-    let u4v5w6x7=[];
-    let y8z9a0b1=performance.now();
-    let c2d3e4f5=0;
-    let g6h7i8j9=0;
-    let k0l1m2n3=[];
-
-    function o4p5q6r7(){
-        c0d1e2f3.width=window.innerWidth;
-        c0d1e2f3.height=window.innerHeight;
-        window.addEventListener('resize',o4p5q6r7);
+    
+    function handleMove(e) {
+      if (isInteracting) {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        interaction = 1.0;
+      }
+    }
+    
+    function endInteraction() {
+      isInteracting = false;
+    }
+    
+    setupCanvas();
+    
+    const fragShaderSource = document.getElementById("fragShader").textContent;  
+    
+    function createShader(gl, type, source) {  
+      const shader = gl.createShader(type);  
+      gl.shaderSource(shader, source);  
+      gl.compileShader(shader);  
+      
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {  
+        console.error('(1) Shader compilation failure:', gl.getShaderInfoLog(shader));  
+        throw new Error(gl.getShaderInfoLog(shader));  
+      }  
+      
+      return shader;  
+    }  
+    
+    function createProgram(gl, fragShaderSource) {  
+      const vertShaderSource = `  
+        attribute vec4 position;  
+        void main() {  
+          gl_Position = position;  
+        }  
+      `;  
+      
+      const vs = createShader(gl, gl.VERTEX_SHADER, vertShaderSource);  
+      const fs = createShader(gl, gl.FRAGMENT_SHADER, fragShaderSource);  
+      const program = gl.createProgram();  
+      
+      gl.attachShader(program, vs);  
+      gl.attachShader(program, fs);  
+      gl.linkProgram(program);  
+      
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {  
+        console.error('(2) Program linking failure:', gl.getProgramInfoLog(program));  
+        throw new Error(gl.getProgramInfoLog(program));  
+      }  
+      
+      return program;  
+    }  
+    
+    const program = createProgram(gl, fragShaderSource);  
+    const positionAttribute = gl.getAttribLocation(program, "position");  
+    const buffer = gl.createBuffer();  
+    
+    function setupBuffers() {
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);  
+      gl.bufferData(  
+        gl.ARRAY_BUFFER,  
+        new Float32Array([  
+          -1, -1, 
+           1, -1, 
+          -1, 1,  
+          -1, 1,  
+           1, -1,  
+           1, 1  
+        ]),  
+        gl.STATIC_DRAW
+      );
+    }
+    
+    setupBuffers();
+    
+    const resolutionUniform = gl.getUniformLocation(program, "u_resolution");  
+    const timeUniform = gl.getUniformLocation(program, "u_time");  
+    const mouseUniform = gl.getUniformLocation(program, "u_mouse");
+    const interactionUniform = gl.getUniformLocation(program, "u_interaction");
+    
+    let start = performance.now();  
+    let instances = [];  
+    let lastTime = performance.now();  
+    let frameCount = 0;  
+    let fps = 0;
+    let frameTimes = [];
+    const frameTimeHistoryLength = 60;
+    
+    const MIN_INSTANCES = 41824;
+    
+    function updateInstances(currentTimeSec) {  
+      const instanceCount = MIN_INSTANCES * Math.pow(2, currentTimeSec * 0.2);
+      
+      instances = [];  
+      
+      for (let i = 0; i < instanceCount; i++) {  
+        let offset = currentTimeSec - (i * 0.05);
+        instances.push(offset);  
+      }  
+    }  
+    
+    function updateFPS(now) {
+      frameCount++;  
+      
+      if (now - lastTime >= 1000) {  
+        fps = frameCount;  
+        frameCount = 0;  
+        lastTime = now;  
         
-        c0d1e2f3.addEventListener('mousedown',s7t8u9v0);
-        c0d1e2f3.addEventListener('mousemove',w1x2y3z4);
-        c0d1e2f3.addEventListener('mouseup',a5b6c7d8);
-        c0d1e2f3.addEventListener('mouseleave',a5b6c7d8);
-        
-        c0d1e2f3.addEventListener('touchstart',(e)=>{
-            e.preventDefault();
-            s7t8u9v0(e.touches[0]);
-        });
-        c0d1e2f3.addEventListener('touchmove',(e)=>{
-            e.preventDefault();
-            w1x2y3z4(e.touches[0]);
-        });
-        c0d1e2f3.addEventListener('touchend',a5b6c7d8);
-        
-        document.addEventListener('click',e9f0g1h2,{once:true});
-        document.addEventListener('touchstart',e9f0g1h2,{once:true});
-    }
 
-    function e9f0g1h2(){
-        o2p3q4r5=new (window.AudioContext||window.webkitAudioContext)();
-        w0x1y2z3=o2p3q4r5.createGain();
-        w0x1y2z3.gain.value=0;
-        w0x1y2z3.connect(o2p3q4r5.destination);
-    }
-
-    function i3j4k5l6(fps){
-        if(!o2p3q4r5) return;
-        if(s6t7u8v9) s6t7u8v9.stop();
-        s6t7u8v9=o2p3q4r5.createOscillator();
-        s6t7u8v9.type='square';
-        const min=5,max=60,clamped=Math.max(min,Math.min(fps,max));
-        s6t7u8v9.frequency.value=150+(clamped/max)*3000;
-        w0x1y2z3.gain.value=0.3+(1-(clamped/max))*0.8;
-        s6t7u8v9.connect(w0x1y2z3);
-        s6t7u8v9.start();
-        s6t7u8v9.stop(o2p3q4r5.currentTime+0.1);
-    }
-
-    function s7t8u9v0(e){
-        m6n7o8p9=true;
-        e8f9g0h1=e.clientX;
-        i2j3k4l5=e.clientY;
-    }
-
-    function w1x2y3z4(e){
-        if(m6n7o8p9){
-            e8f9g0h1=e.clientX;
-            i2j3k4l5=e.clientY;
-            a4b5c6d7=1.0;
+        if (fps > 0) {
+          playBeep(fps);
         }
+      }
+      
+      frameTimes.push(performance.now());
+      if (frameTimes.length > frameTimeHistoryLength) {
+        frameTimes.shift();
+      }
     }
-
-    function a5b6c7d8(){
-        m6n7o8p9=false;
+    
+    function updateInteraction(deltaTime) {
+      if (!isInteracting) {
+        interaction = Math.max(0, interaction - deltaTime * 0.5);
+      }
     }
-
-    function m7n8o9p0(gl,type,source){
-        const s=gl.createShader(type);
-        gl.shaderSource(s,source);
-        gl.compileShader(s);
-        if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)){
-            console.error('Shader error:',gl.getShaderInfoLog(s));
-            throw new Error(gl.getShaderInfoLog(s));
-        }
-        return s;
-    }
-
-    function q1r2s3t4(gl,frag){
-        const vert=`attribute vec4 p;void main(){gl_Position=p;}`;
-        const vs=m7n8o9p0(gl,gl.VERTEX_SHADER,vert);
-        const fs=m7n8o9p0(gl,gl.FRAGMENT_SHADER,frag);
-        const p=gl.createProgram();
-        gl.attachShader(p,vs);
-        gl.attachShader(p,fs);
-        gl.linkProgram(p);
-        if(!gl.getProgramParameter(p,gl.LINK_STATUS)){
-            console.error('Program error:',gl.getProgramInfoLog(p));
-            throw new Error(gl.getProgramInfoLog(p));
-        }
-        return p;
-    }
-
-    const u5v6w7x8=q1r2s3t4(g4h5i6j7,k8l9m0n1);
-    const y9z0a1b2=g4h5i6j7.getAttribLocation(u5v6w7x8,"p");
-    const c3d4e5f6=g4h5i6j7.createBuffer();
-
-    function g7h8i9j0(){
-        g4h5i6j7.bindBuffer(g4h5i6j7.ARRAY_BUFFER,c3d4e5f6);
-        g4h5i6j7.bufferData(
-            g4h5i6j7.ARRAY_BUFFER,
-            new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),
-            g4h5i6j7.STATIC_DRAW
-        );
-    }
-
-    g7h8i9j0();
-
-    const k1l2m3n4=g4h5i6j7.getUniformLocation(u5v6w7x8,"u_res");
-    const o5p6q7r8=g4h5i6j7.getUniformLocation(u5v6w7x8,"u_t");
-    const s9t0u1v2=g4h5i6j7.getUniformLocation(u5v6w7x8,"u_m");
-    const w3x4y5z6=g4h5i6j7.getUniformLocation(u5v6w7x8,"u_i");
-
-    function a6b7c8d9(t){
-        const i=q0r1s2t3*Math.pow(2,t*0.4);
-        u4v5w6x7=[];
-        for(let n=0;n<i;n++){
-            u4v5w6x7.push(t-(n*0.02));
-            u4v5w6x7.push(t-(n*0.02)+0.01); // Double layers
-        }
-    }
-
-    function e0f1g2h3(now){
-        c2d3e4f5++;
-        if(now-y8z9a0b1>=1000){
-            g6h7i8j9=c2d3e4f5;
-            c2d3e4f5=0;
-            y8z9a0b1=now;
-            console.log(
-                `0x${g6h7i8j9.toString(16)}|`+
-                `0x${u4v5w6x7.length.toString(16)}|`+
-                `0x${((now-start)/1000).toString(16)}`
-            );
-            i3j4k5l6(g6h7i8j9);
-        }
-        k0l1m2n3.push(performance.now());
-        if(k0l1m2n3.length>60)k0l1m2n3.shift();
-    }
-
-    function i4j5k6l7(dt){
-        if(!m6n7o8p9)a4b5c6d7=Math.max(0,a4b5c6d7-dt*0.9);
-    }
-
-    function m8n9o0p1(){
-        const n=performance.now();
-        const d=(n-y8z9a0b1)/1000;
-        const e=(n-start)/1000;
-        
-        e0f1g2h3(n);
-        i4j5k6l7(d);
-        a6b7c8d9(e);
-        
-        g4h5i6j7.viewport(0,0,c0d1e2f3.width,c0d1e2f3.height);
-        g4h5i6j7.clear(g4h5i6j7.COLOR_BUFFER_BIT);
-        g4h5i6j7.useProgram(u5v6w7x8);
-        g4h5i6j7.enableVertexAttribArray(y9z0a1b2);
-        g4h5i6j7.bindBuffer(g4h5i6j7.ARRAY_BUFFER,c3d4e5f6);
-        g4h5i6j7.vertexAttribPointer(y9z0a1b2,2,g4h5i6j7.FLOAT,false,0,0);
-        g4h5i6j7.uniform2f(k1l2m3n4,c0d1e2f3.width,c0d1e2f3.height);
-        g4h5i6j7.uniform2f(s9t0u1v2,e8f9g0h1/c0d1e2f3.width,1.0-i2j3k4l5/c0d1e2f3.height);
-        g4h5i6j7.uniform1f(w3x4y5z6,a4b5c6d7);
-        
-        for(let t of u4v5w6x7){
-            g4h5i6j7.uniform1f(o5p6q7r8,t);
-            g4h5i6j7.drawArrays(g4h5i6j7.TRIANGLES,0,6);
-        }
-        requestAnimationFrame(m8n9o0p1);
-    }
-
-    o4p5q6r7();
-    const start=performance.now();
-    m8n9o0p1();
-    </script>
-</body>
+  
+    function render() {  
+      const now = performance.now();  
+      const deltaTime = (now - lastTime) / 1000;
+      const elapsed = (now - start) / 1000;  
+      
+      updateFPS(now);
+      updateInteraction(deltaTime);
+      updateInstances(elapsed);  
+      
+      gl.viewport(0, 0, canvas.width, canvas.height);  
+      gl.clear(gl.COLOR_BUFFER_BIT);  
+      gl.useProgram(program);  
+      gl.enableVertexAttribArray(positionAttribute);  
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);  
+      gl.vertexAttribPointer(positionAttribute, 2, gl.FLOAT, false, 0, 0);  
+      gl.uniform2f(resolutionUniform, canvas.width, canvas.height);  
+      gl.uniform2f(mouseUniform, mouseX / canvas.width, 1.0 - mouseY / canvas.height);
+      gl.uniform1f(interactionUniform, interaction);
+      
+      for (let t of instances) {  
+        gl.uniform1f(timeUniform, t);  
+        gl.drawArrays(gl.TRIANGLES, 0, 6);  
+      }  
+      
+      updateInfoDisplay(elapsed);
+      
+      requestAnimationFrame(render);  
+    }  
+    
+    function updateInfoDisplay(elapsed) {
+      let avgFrameTime = 0;
+      if (frameTimes.length > 1) {
+        const totalTime = frameTimes[frameTimes.length - 1] - frameTimes[0];
+        avgFrameTime = totalTime / (frameTimes.length - 1);
+      }
+      
+      infoElement.innerHTML = `
+      ${fps}${instances.length}${avgFrameTime.toFixed(2)}${elapsed.toFixed(2)}${canvas.width}${canvas.height}
+      `;
+    }   
+    render();
+  </script></body>
 </html>
