@@ -21,9 +21,19 @@
   <div class="fixed inset-0 z-10 blur-[50px] bg-black">
     <iframe src="https://9112000.github.io/BlackHole/public/main.html" class="w-full h-full border-0"></iframe>
   </div>
-  <div id="timer" 
-       class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[70px] font-bold text-white opacity-30 z-20">
+  <div id="timer" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[70px] font-bold text-white opacity-30 z-20">
   </div>
-  <script src="/src/index.js"></script>
+  <script>
+    let timeLeft = 30;
+    const timerEl = document.getElementById('timer');
+    const countdown = setInterval(() => {
+      timeLeft--;
+      timerEl.textContent = timeLeft;
+      if (timeLeft <= 0) {
+        clearInterval(countdown);
+        history.back();
+      }
+    }, 1000);
+  </script>
 </body>
 </html>
