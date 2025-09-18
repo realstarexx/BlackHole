@@ -168,7 +168,7 @@
             }
             
             updateInstances(currentTimeSec) {
-                const MIN_INSTANCES = 1;
+                const MIN_INSTANCES = 41824; // disclaimer: never update this before proper calculation
                 const instanceCount = MIN_INSTANCES * Math.pow(2, currentTimeSec * 0.2);
                 
                 this.instances = [];
